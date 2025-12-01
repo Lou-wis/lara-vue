@@ -12,7 +12,7 @@ class Employee extends Model
         'name',
         'email',
         'position',
-        'department',
+        'department_id',
         'hire_date',
     ];
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Employee;
+use App\Models\Department;
 use Illuminate\Http\Request;
 use Inertia\Inertia; 
 
@@ -14,11 +15,15 @@ class EmployeeController extends Controller
     public function index()
     {
         $employees = Employee::query()
-        ->select('id', 'name', 'email', 'position', 'department', 'hire_date')
+        ->select('id', 'name', 'email', 'position', 'department_id', 'hire_date')
         ->get();
+
+        $departments = Department::select('id', 'department_name')->get();
+        
 
         return Inertia::render('Employees/Index', [
             'employees' => $employees,
+            'departments' => $departments,
         ]);
     }
 
@@ -35,7 +40,17 @@ class EmployeeController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name'          => ['required', 'string', 'max:255'],
+            'email'         => ['required', 'email', 'max:255'],
+            'position'      => ['nullable', 'string', 'max:255'],
+            'department_id' => ['required', 'exists:departments,id'],
+            'hire_date'     => ['nullable', 'date'],
+        ]);
+
+        Employee::create($validated);
+
+        return redirect()->route('employees.index');
     }
 
     /**
